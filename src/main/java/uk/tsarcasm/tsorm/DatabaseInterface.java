@@ -13,7 +13,7 @@ public interface DatabaseInterface<T extends Entity> {
    * @param obj The entity to create in the database
    * @return A copy of the entity with a new primary key
    */
-  T create(T obj); // create
+  T insert(T obj); // create
 
   /**
    * Instantiate an entity for the matching entry in the database

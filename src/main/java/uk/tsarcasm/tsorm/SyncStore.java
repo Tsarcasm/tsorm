@@ -13,6 +13,6 @@ public class SyncStore<T extends Entity> extends DatabaseStore<T> {
 
   @Override
   protected T db_create(T obj) {
-    return dbi.create(obj);
+    return dbi.insert(obj);
   }
 }
