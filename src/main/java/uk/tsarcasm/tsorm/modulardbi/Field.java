@@ -3,6 +3,7 @@ package uk.tsarcasm.tsorm.modulardbi;
 import uk.tsarcasm.tsorm.Entity;
 
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.function.Function;
 
 public abstract class Field<T, E extends Entity> {
@@ -17,7 +18,7 @@ public abstract class Field<T, E extends Entity> {
     return defaultValue == null ? null : defaultValue.toString();
   }
 
-  public abstract void setValue(int i, PreparedStatement statement);
+  public abstract void setValue(int i, PreparedStatement statement) throws SQLException;
 
   public abstract String getType();
 
