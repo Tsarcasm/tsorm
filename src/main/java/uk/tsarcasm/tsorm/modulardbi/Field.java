@@ -27,7 +27,9 @@ public abstract class Field<T> {
     _setValue(i, statement, val);
   }
 
-  public abstract FieldValue<T> getValue(String name, ResultSet results) throws SQLException;
+  public FieldValue<T> getValue(String name, ResultSet results) throws SQLException {
+    return new FieldValue<>(_getValue(name, results));
+  }
 
   public abstract String getType();
 
@@ -42,6 +44,8 @@ public abstract class Field<T> {
   }
 
   protected abstract void _setValue(int i, PreparedStatement statement, T value) throws SQLException;
+
+  protected abstract T _getValue(String name, ResultSet results) throws SQLException;
 
 
 }

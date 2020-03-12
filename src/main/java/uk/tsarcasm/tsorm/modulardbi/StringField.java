@@ -6,12 +6,13 @@ import java.sql.SQLException;
 
 public class StringField extends Field<String> {
   @Override
-  public void _setValue(int i, PreparedStatement statement, String value) throws SQLException {
+  protected void _setValue(int i, PreparedStatement statement, String value) throws SQLException {
     statement.setString(i, value);
   }
 
-  public FieldValue<String> getValue(String name, ResultSet results) throws SQLException {
-    return new FieldValue<>(results.getString(name));
+
+  public String _getValue(String name, ResultSet results) throws SQLException {
+    return results.getString(name);
   }
 
   @Override
