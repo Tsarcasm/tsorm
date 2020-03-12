@@ -1,12 +1,10 @@
 package uk.tsarcasm.tsorm.modulardbi;
 
-import uk.tsarcasm.tsorm.Entity;
-
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.function.Function;
 
-public abstract class Field<T, E extends Entity> {
+public abstract class Field<T> {
   protected final T defaultValue;
   protected boolean nullable;
 
@@ -18,7 +16,18 @@ public abstract class Field<T, E extends Entity> {
     return defaultValue == null ? null : defaultValue.toString();
   }
 
-  public abstract void setValue(int i, PreparedStatement statement) throws SQLException;
+  public static Field<?> notNull(Field<?> f) {
+    f.nullable = false;
+    if (f.defaultValue == null) throw new IllegalArgumentException("A not null field cannot have a null default value");
+    return f;
+  }
+
+  public void setValue(int i, PreparedStatement statement, FieldValue<?> value) throws SQLException {
+    @SuppressWarnings("unchecked") T val = (T) value.getValue();
+    _setValue(i, statement, val);
+  }
+
+  public abstract FieldValue<T> getValue(String name, ResultSet results) throws SQLException;
 
   public abstract String getType();
 
@@ -32,11 +41,7 @@ public abstract class Field<T, E extends Entity> {
     this.nullable = true;
   }
 
-  public static Field notNull(Field f) {
-    f.nullable = false;
-    if (f.defaultValue == null) throw new IllegalArgumentException("A not null field cannot have a null default value");
-    return f;
-  }
+  protected abstract void _setValue(int i, PreparedStatement statement, T value) throws SQLException;
 
 
 }

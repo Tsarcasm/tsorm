@@ -1,14 +1,17 @@
 package uk.tsarcasm.tsorm.modulardbi;
 
-import uk.tsarcasm.tsorm.Entity;
-
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class StringField<E extends Entity> extends Field<String, E> {
+public class StringField extends Field<String> {
   @Override
-  public void setValue(int i, PreparedStatement statement) throws SQLException {
-    statement.setString(i, "test");
+  public void _setValue(int i, PreparedStatement statement, String value) throws SQLException {
+    statement.setString(i, value);
+  }
+
+  public FieldValue<String> getValue(String name, ResultSet results) throws SQLException {
+    return new FieldValue<>(results.getString(name));
   }
 
   @Override
