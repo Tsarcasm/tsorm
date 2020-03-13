@@ -15,6 +15,7 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
     public final boolean canDelete;
     public String name;
     protected List<Pair<String, Field<?>>> fields;
+    private HashMap<String, FieldValue<?>> valueSet;
     private String createTableSql;
     private String insertSql;
     private String deleteSql;
@@ -37,6 +38,7 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
         this.loadSql = loadQuery();
         this.loadAllSql = loadAllQuery();
     }
+
 
     protected void addPk() {
         fields.add(new Pair<>("pk", new IntField()));
@@ -143,11 +145,24 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
     }
 
 
-    protected abstract T instantiate_select(HashMap<String, FieldValue<?>> valueSet);
+    protected final <V> V getValue(String name) {
+        @SuppressWarnings("unchecked") V value = (V) valueSet.get(name).getValue();
+        return value;
+    }
 
-    protected abstract T instantiate_insert(HashMap<String, FieldValue<?>> valueSet, int pk);
+    protected final <V> void setValue(String name, V value) {
+        valueSet.put(name, new FieldValue<V>(value));
+    }
 
-    protected abstract HashMap<String, FieldValue<?>> getFieldValuesFromEntity(T entity);
+
+
+
+
+    protected abstract T instantiateSelect();
+
+    protected abstract T instantiateInsert(int pk);
+
+    protected abstract void entityToFieldValues(T entity);
 
     private HashMap<String, FieldValue<?>> resultSetToFieldValues(ResultSet resultSet) throws SQLException {
         HashMap<String, FieldValue<?>> values = new HashMap<>();
@@ -184,12 +199,13 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
                 // Populate all values in the query
                 int i = 1;
                 // Get a all the values to fill the query with
-                HashMap<String, FieldValue<?>> values = getFieldValuesFromEntity(obj);
+                valueSet.clear();
+                entityToFieldValues(obj);
                 for (Pair<String, Field<?>> kvp : fields) {
                     // Find the value for each field and set it in the statment
                     String name = kvp.getKey();
                     Field<?> field = kvp.getValue();
-                    field.setValue(i, statement, values.get(name));
+                    field.setValue(i, statement, valueSet.get(name));
                     i++;
                 }
                 statement.executeUpdate();
@@ -197,7 +213,7 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
 
                 if (rs.next()) {
                     int newPk = rs.getInt(1);
-                    return instantiate_insert(getFieldValuesFromEntity(obj), newPk);
+                    return instantiateInsert(newPk);
                 }
             }
         } catch (SQLException e) {
@@ -216,7 +232,8 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
                 ResultSet results = statement.executeQuery();
                 if (results.next()) {
                     //Get all accounts
-                    return instantiate_select(resultSetToFieldValues(results));
+                    valueSet = resultSetToFieldValues(results);
+                    return instantiateSelect();
                 }
             }
         } catch (SQLException e) {
@@ -233,12 +250,13 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
                 // Populate all values in the query
                 int i = 1;
                 // Get a all the values to fill the query with
-                HashMap<String, FieldValue<?>> values = getFieldValuesFromEntity(obj);
+                valueSet.clear();
+                entityToFieldValues(obj);
                 for (Pair<String, Field<?>> kvp : fields) {
                     // Find the value for each field and set it in the statment
                     String name = kvp.getKey();
                     Field<?> field = kvp.getValue();
-                    field.setValue(i, statement, values.get(name));
+                    field.setValue(i, statement, valueSet.get(name));
                     i++;
                 }
                 // Set the pk to save
@@ -279,7 +297,8 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
                 //Get all objects
                 while (results.next()) {
                     // Instantiate one by one
-                    objects.add(instantiate_select(resultSetToFieldValues(results)));
+                    valueSet = resultSetToFieldValues(results);
+                    objects.add(instantiateSelect());
                 }
             }
         } catch (SQLException e) {
