@@ -18,6 +18,8 @@ public class CompanyDBI extends ModularDbi<Company> {
         addField("name", new StringField());
         addField("num_employees", new IntField());
         addField("net_worth", new DoubleField());
+
+        setupQueryStrings();
     }
 
     @Override
