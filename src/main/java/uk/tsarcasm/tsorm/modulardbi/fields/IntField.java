@@ -1,4 +1,6 @@
-package uk.tsarcasm.tsorm.modulardbi;
+package uk.tsarcasm.tsorm.modulardbi.fields;
+
+import uk.tsarcasm.tsorm.modulardbi.Field;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,12 +14,12 @@ public class IntField extends Field<Integer> {
     }
 
     @Override
-    protected void _setValue(int i, PreparedStatement statement, Integer value) throws SQLException {
+    protected void setupStatement(int i, PreparedStatement statement, Integer value) throws SQLException {
         statement.setInt(i, value);
     }
 
     @Override
-    protected Integer _getValue(String name, ResultSet results) throws SQLException {
+    protected Integer getResult(String name, ResultSet results) throws SQLException {
         return results.getInt(name);
     }
 }

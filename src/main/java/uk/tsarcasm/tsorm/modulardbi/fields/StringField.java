@@ -1,4 +1,6 @@
-package uk.tsarcasm.tsorm.modulardbi;
+package uk.tsarcasm.tsorm.modulardbi.fields;
+
+import uk.tsarcasm.tsorm.modulardbi.Field;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -6,12 +8,12 @@ import java.sql.SQLException;
 
 public class StringField extends Field<String> {
     @Override
-    protected void _setValue(int i, PreparedStatement statement, String value) throws SQLException {
+    protected void setupStatement(int i, PreparedStatement statement, String value) throws SQLException {
         statement.setString(i, value);
     }
 
 
-    public String _getValue(String name, ResultSet results) throws SQLException {
+    public String getResult(String name, ResultSet results) throws SQLException {
         return results.getString(name);
     }
 

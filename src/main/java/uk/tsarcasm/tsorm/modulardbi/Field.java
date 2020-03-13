@@ -35,18 +35,18 @@ public abstract class Field<T> {
 
     public void setValue(int i, PreparedStatement statement, FieldValue<?> value) throws SQLException {
         @SuppressWarnings("unchecked") T val = (T) value.getValue();
-        _setValue(i, statement, val);
+        setupStatement(i, statement, val);
     }
 
     public FieldValue<T> getValue(String name, ResultSet results) throws SQLException {
-        return new FieldValue<>(_getValue(name, results));
+        return new FieldValue<>(getResult(name, results));
     }
 
     public abstract String getType();
 
-    protected abstract void _setValue(int i, PreparedStatement statement, T value) throws SQLException;
+    protected abstract void setupStatement(int i, PreparedStatement statement, T value) throws SQLException;
 
-    protected abstract T _getValue(String name, ResultSet results) throws SQLException;
+    protected abstract T getResult(String name, ResultSet results) throws SQLException;
 
 
 }

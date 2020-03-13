@@ -3,6 +3,7 @@ package uk.tsarcasm.tsorm.modulardbi;
 import javafx.util.Pair;
 import uk.tsarcasm.tsorm.Entity;
 import uk.tsarcasm.tsorm.JavaSqlDBI;
+import uk.tsarcasm.tsorm.modulardbi.fields.IntField;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -151,7 +152,7 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
     }
 
     protected final <V> void setValue(String name, V value) {
-        valueSet.put(name, new FieldValue<V>(value));
+        valueSet.put(name, new FieldValue<>(value));
     }
 
 
