@@ -30,7 +30,7 @@ public interface DatabaseInterface<T extends Entity> {
      * @param obj The entity to save to the database
      * @return Boolean, true if the operation was successful
      */
-    boolean save(T obj); // update
+    boolean update(T obj); // update
 
     boolean delete(T obj); // delete
 

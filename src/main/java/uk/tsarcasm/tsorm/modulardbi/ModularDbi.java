@@ -20,7 +20,7 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
     private String createTableSql;
     private String insertSql;
     private String deleteSql;
-    private String saveSql;
+    private String updateSql;
     private String loadSql;
     private String loadAllSql;
 
@@ -35,7 +35,7 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
         this.createTableSql = createTableQuery();
         this.insertSql = insertQuery();
         this.deleteSql = deleteQuery();
-        this.saveSql = saveQuery();
+        this.updateSql = updateQuery();
         this.loadSql = loadQuery();
         this.loadAllSql = loadAllQuery();
     }
@@ -110,7 +110,7 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
         return "DELETE FROM " + name + " WHERE " + fields.get(0).getKey() + " = ?";
     }
 
-    private String saveQuery() {
+    private String updateQuery() {
         //  "UPDATE table SET player_uuid = ?, balance = ?, share = ?, account_pk = ? WHERE pk = ?");
         StringBuilder query = new StringBuilder("UPDATE ").append(name).append(" SET ");
         // First specify field names
@@ -163,7 +163,7 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
 
     protected abstract T instantiateInsert(int pk);
 
-    protected abstract void entityToFieldValues(T entity);
+    protected abstract void entityToFieldValues(T obj);
 
     private HashMap<String, FieldValue<?>> resultSetToFieldValues(ResultSet resultSet) throws SQLException {
         HashMap<String, FieldValue<?>> values = new HashMap<>();
@@ -244,10 +244,10 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
     }
 
     @Override
-    public boolean save(T obj) {
+    public boolean update(T obj) {
         try {
             try (Connection conn = getConnection()) {
-                PreparedStatement statement = conn.prepareStatement(saveSql);
+                PreparedStatement statement = conn.prepareStatement(updateSql);
                 // Populate all values in the query
                 int i = 1;
                 // Get a all the values to fill the query with
@@ -260,7 +260,7 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
                     field.setValue(i, statement, valueSet.get(name));
                     i++;
                 }
-                // Set the pk to save
+                // Set the pk to update
                 statement.setInt(i, obj.pk);
                 statement.executeUpdate();
                 return true;
