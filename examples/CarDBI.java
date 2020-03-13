@@ -1,5 +1,3 @@
-package uk.tsarcasm.examples;
-
 import uk.tsarcasm.tsorm.modulardbi.ModularDbi;
 import uk.tsarcasm.tsorm.modulardbi.fields.IntField;
 import uk.tsarcasm.tsorm.modulardbi.fields.StringField;
