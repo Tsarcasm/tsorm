@@ -156,9 +156,6 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
     }
 
 
-
-
-
     protected abstract T instantiateSelect();
 
     protected abstract T instantiateInsert(int pk);

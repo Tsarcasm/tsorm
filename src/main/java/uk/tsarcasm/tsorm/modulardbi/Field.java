@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public abstract class Field<T> {
-    protected final T defaultValue;
+    protected final String defaultValue;
     protected boolean nullable;
 
     public Field() {
@@ -13,7 +13,7 @@ public abstract class Field<T> {
         this.nullable = true;
     }
 
-    public Field(T defaultValue) {
+    public Field(String defaultValue) {
         this.defaultValue = defaultValue;
         this.nullable = true;
     }
@@ -30,7 +30,7 @@ public abstract class Field<T> {
     }
 
     public String getDefaultValue() {
-        return defaultValue == null ? null : defaultValue.toString();
+        return defaultValue;
     }
 
     public void setValue(int i, PreparedStatement statement, FieldValue<?> value) throws SQLException {
