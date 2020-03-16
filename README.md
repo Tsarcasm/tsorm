@@ -3,7 +3,7 @@ A bare-metal Java ORM designed to remove tedious boilerplate SQL while giving th
 programmer a high degree of control.
 
 ### Installation
-##### Jitpack 
+#### Jitpack 
  - Gradle:
  Add `compile 'com.github.Tsarcasm:tsorm:v1.1'` to your dependencies
     
