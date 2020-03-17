@@ -1,3 +1,5 @@
+package uk.tsarcasm.tsorm.examples;
+
 import uk.tsarcasm.tsorm.Entity;
 
 import java.util.ArrayList;

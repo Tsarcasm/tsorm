@@ -3,20 +3,17 @@ package uk.tsarcasm.tsorm.modulardbi;
 import javafx.util.Pair;
 import uk.tsarcasm.tsorm.Entity;
 import uk.tsarcasm.tsorm.JavaSqlDBI;
-import uk.tsarcasm.tsorm.modulardbi.fields.IntField;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 
 public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
     public final boolean canDelete;
     public String name;
-    protected List<Pair<String, Field<?>>> fields;
-    private HashMap<String, FieldValue<?>> valueSet;
+    protected EntityMeta<T> entityMeta;
     private String createTableSql;
     private String insertSql;
     private String deleteSql;
@@ -24,10 +21,10 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
     private String loadSql;
     private String loadAllSql;
 
-    public ModularDbi(DataSource dataSource, boolean canDelete) {
+    public ModularDbi(DataSource dataSource, EntityMeta<T> entityMeta, boolean canDelete) {
         super(dataSource);
+        this.entityMeta = entityMeta;
         this.canDelete = canDelete;
-        fields = new ArrayList<>();
     }
 
     // This must be called at the end of the constructor of subclasses
@@ -39,23 +36,13 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
         this.loadSql = loadQuery();
         this.loadAllSql = loadAllQuery();
     }
-
-
-    protected void addPk() {
-        fields.add(new Pair<>("pk", new IntField()));
-    }
-
-    protected void addField(String name, Field<?> field) {
-        fields.add(new Pair<>(name, field));
-    }
-
     private String createTableQuery() {
         StringBuilder string = new StringBuilder().append("CREATE TABLE IF NOT EXISTS ").append(name).append(" (");
 
         // Add each field to the query
-        for (int i = 0; i < fields.size(); i++) {
-            String name = fields.get(i).getKey();
-            Field<?> field = fields.get(i).getValue();
+        for (int i = 0; i < entityMeta.getFields().size(); i++) {
+            String name = entityMeta.getFields().get(i).getKey();
+            Field<?> field = entityMeta.getFields().get(i).getValue();
             // Add the name
             string.append(name).append(" ").append(field.getType()).append(" ");
             // If this is the first field then it is the primary key
@@ -80,7 +67,7 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
             string.append(", ");
         }
         // Finally specify primary key
-        string.append("PRIMARY KEY (").append(fields.get(0).getKey()).append(") )");
+        string.append("PRIMARY KEY (").append(entityMeta.getFields().get(0).getKey()).append(") )");
         return string.toString();
     }
 
@@ -89,17 +76,17 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
         StringBuilder query = new StringBuilder("INSERT INTO ").append(name).append(" (");
 
         // First specify field names
-        for (int i = 0; i < fields.size(); i++) {
-            String name = fields.get(i).getKey();
+        for (int i = 0; i < entityMeta.getFields().size(); i++) {
+            String name = entityMeta.getFields().get(i).getKey();
             query.append(name);
-            if (i < fields.size() - 1) query.append(", ");
+            if (i < entityMeta.getFields().size() - 1) query.append(", ");
         }
 
         // Then add value substitutes
         query.append(") VALUES (");
-        for (int i = 0; i < fields.size(); i++) {
+        for (int i = 0; i < entityMeta.getFields().size(); i++) {
             query.append("?");
-            if (i < fields.size() - 1) query.append(", ");
+            if (i < entityMeta.getFields().size() - 1) query.append(", ");
         }
         query.append(")");
         return query.toString();
@@ -107,26 +94,26 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
 
     private String deleteQuery() {
         // DELETE FROM name WHERE pk = ?
-        return "DELETE FROM " + name + " WHERE " + fields.get(0).getKey() + " = ?";
+        return "DELETE FROM " + name + " WHERE " + entityMeta.getFields().get(0).getKey() + " = ?";
     }
 
     private String updateQuery() {
         //  "UPDATE table SET player_uuid = ?, balance = ?, share = ?, account_pk = ? WHERE pk = ?");
         StringBuilder query = new StringBuilder("UPDATE ").append(name).append(" SET ");
         // First specify field names
-        for (int i = 0; i < fields.size(); i++) {
-            String name = fields.get(i).getKey();
+        for (int i = 0; i < entityMeta.getFields().size(); i++) {
+            String name = entityMeta.getFields().get(i).getKey();
             query.append(name).append(" = ?");
-            if (i < fields.size() - 1) query.append(", ");
+            if (i < entityMeta.getFields().size() - 1) query.append(", ");
         }
         // Add where clause for PK
-        query.append(" WHERE ").append(fields.get(0).getKey()).append(" = ?");
+        query.append(" WHERE ").append(entityMeta.getFields().get(0).getKey()).append(" = ?");
         return query.toString();
     }
 
     private String loadQuery() {
         // Add where clause
-        return loadAllQuery() + " WHERE " + fields.get(0).getKey() + " = ?";
+        return loadAllQuery() + " WHERE " + entityMeta.getFields().get(0).getKey() + " = ?";
     }
 
     private String loadAllQuery() {
@@ -135,37 +122,20 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
         StringBuilder query = new StringBuilder("SELECT ");
 
         // First specify field names
-        for (int i = 0; i < fields.size(); i++) {
-            String name = fields.get(i).getKey();
+        for (int i = 0; i < entityMeta.getFields().size(); i++) {
+            String name = entityMeta.getFields().get(i).getKey();
             query.append(name);
-            if (i < fields.size() - 1) query.append(", ");
+            if (i < entityMeta.getFields().size() - 1) query.append(", ");
         }
 
         query.append(" FROM ").append(name);
         return query.toString();
     }
 
-
-    protected final <V> V getValue(String name) {
-        @SuppressWarnings("unchecked") V value = (V) valueSet.get(name).getValue();
-        return value;
-    }
-
-    protected final <V> void setValue(String name, V value) {
-        valueSet.put(name, new FieldValue<>(value));
-    }
-
-
-    protected abstract T instantiateSelect();
-
-    protected abstract T instantiateInsert(int pk);
-
-    protected abstract void entityToFieldValues(T obj);
-
     private HashMap<String, FieldValue<?>> resultSetToFieldValues(ResultSet resultSet) throws SQLException {
         HashMap<String, FieldValue<?>> values = new HashMap<>();
-        for (Pair<String, Field<?>> kvp : fields) {
-            // Find the value for each field and set it in the statment
+        for (Pair<String, Field<?>> kvp : entityMeta.getFields()) {
+            // Find the value for each field and set it in the statement
             String name = kvp.getKey();
             Field<?> field = kvp.getValue();
             values.put(name, field.getValue(name, resultSet));
@@ -197,13 +167,12 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
                 // Populate all values in the query
                 int i = 1;
                 // Get a all the values to fill the query with
-                valueSet.clear();
-                entityToFieldValues(obj);
-                for (Pair<String, Field<?>> kvp : fields) {
+                HashMap<String, FieldValue<?>> values = entityMeta.getValues(obj);
+                for (Pair<String, Field<?>> kvp : entityMeta.getFields()) {
                     // Find the value for each field and set it in the statment
                     String name = kvp.getKey();
                     Field<?> field = kvp.getValue();
-                    field.setValue(i, statement, valueSet.get(name));
+                    field.setValue(i, statement, values.get(name));
                     i++;
                 }
                 statement.executeUpdate();
@@ -211,7 +180,7 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
 
                 if (rs.next()) {
                     int newPk = rs.getInt(1);
-                    return instantiateInsert(newPk);
+                    return entityMeta.instantiate(values);
                 }
             }
         } catch (SQLException e) {
@@ -230,8 +199,7 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
                 ResultSet results = statement.executeQuery();
                 if (results.next()) {
                     //Get all accounts
-                    valueSet = resultSetToFieldValues(results);
-                    return instantiateSelect();
+                    return entityMeta.instantiate(resultSetToFieldValues(results));
                 }
             }
         } catch (SQLException e) {
@@ -248,13 +216,12 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
                 // Populate all values in the query
                 int i = 1;
                 // Get a all the values to fill the query with
-                valueSet.clear();
-                entityToFieldValues(obj);
-                for (Pair<String, Field<?>> kvp : fields) {
+                HashMap<String, FieldValue<?>> values = entityMeta.getValues(obj);
+                for (Pair<String, Field<?>> kvp : entityMeta.getFields()) {
                     // Find the value for each field and set it in the statment
                     String name = kvp.getKey();
                     Field<?> field = kvp.getValue();
-                    field.setValue(i, statement, valueSet.get(name));
+                    field.setValue(i, statement, values.get(name));
                     i++;
                 }
                 // Set the pk to update
@@ -295,8 +262,7 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
                 //Get all objects
                 while (results.next()) {
                     // Instantiate one by one
-                    valueSet = resultSetToFieldValues(results);
-                    objects.add(instantiateSelect());
+                    objects.add(entityMeta.instantiate(resultSetToFieldValues(results)));
                 }
             }
         } catch (SQLException e) {
