@@ -144,7 +144,7 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
     }
 
     @Override
-    protected boolean createTable() {
+    public boolean createTable() {
         try {
             try (Connection conn = getConnection()) {
                 conn.createStatement().executeUpdate(createTableSql);
