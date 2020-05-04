@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
+public class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
     public final boolean canDelete;
     public String name;
     protected EntityMeta<T> entityMeta;
@@ -250,8 +250,13 @@ public abstract class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
         return false;
     }
 
+  @Override
+  public T refreshRelations(T obj) {
+    return entityMeta.refreshRelations(obj);
+  }
 
-    @Override
+
+  @Override
     public Collection<T> loadAll() {
         Collection<T> objects = new ArrayList<>();
         try {
