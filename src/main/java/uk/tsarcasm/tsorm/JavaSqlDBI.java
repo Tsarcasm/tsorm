@@ -11,7 +11,7 @@ public abstract class JavaSqlDBI<T extends Entity> implements DatabaseInterface<
         this.dataSource = dataSource;
     }
 
-    protected abstract boolean createTable();
+    public abstract boolean createTable();
 
     protected Connection getConnection() throws SQLException {
         return dataSource.getConnection();
