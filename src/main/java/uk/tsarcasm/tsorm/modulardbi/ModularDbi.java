@@ -25,6 +25,7 @@ public class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
         super(dataSource);
         this.entityMeta = entityMeta;
         this.canDelete = canDelete;
+        setupQueryStrings();
     }
 
     // This must be called at the end of the constructor of subclasses
