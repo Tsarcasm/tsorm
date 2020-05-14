@@ -1,15 +1,15 @@
 package uk.tsarcasm.tsorm.modulardbi;
 
-import javafx.util.Pair;
 import uk.tsarcasm.tsorm.Entity;
 import uk.tsarcasm.tsorm.modulardbi.fields.IntField;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public abstract class EntityMeta<T extends Entity> {
-    private final List<Pair<String, Field<?>>> fields;
+    private final List<AbstractMap.SimpleEntry<String, Field<?>>> fields;
     private HashMap<String, FieldValue<?>> values;
     private final HashMap<String, FieldValue<?>> internalValues;
 
@@ -19,14 +19,14 @@ public abstract class EntityMeta<T extends Entity> {
     }
 
     protected void addPk() {
-        fields.add(new Pair<>("pk", new IntField()));
+        fields.add(new AbstractMap.SimpleEntry<>("pk", new IntField()));
     }
 
     protected void addField(String name, Field<?> field) {
-        fields.add(new Pair<>(name, field));
+        fields.add(new AbstractMap.SimpleEntry<>(name, field));
     }
 
-    public List<Pair<String, Field<?>>> getFields() {
+    public List<AbstractMap.SimpleEntry<String, Field<?>>> getFields() {
         return fields;
     }
 

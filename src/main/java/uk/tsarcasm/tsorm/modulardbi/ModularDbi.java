@@ -1,11 +1,11 @@
 package uk.tsarcasm.tsorm.modulardbi;
 
-import javafx.util.Pair;
 import uk.tsarcasm.tsorm.Entity;
 import uk.tsarcasm.tsorm.JavaSqlDBI;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -134,7 +134,7 @@ public class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
 
     private HashMap<String, FieldValue<?>> resultSetToFieldValues(ResultSet resultSet) throws SQLException {
         HashMap<String, FieldValue<?>> values = new HashMap<>();
-        for (Pair<String, Field<?>> kvp : entityMeta.getFields()) {
+        for (AbstractMap.SimpleEntry<String, Field<?>> kvp : entityMeta.getFields()) {
             // Find the value for each field and set it in the statement
             String name = kvp.getKey();
             Field<?> field = kvp.getValue();
@@ -168,7 +168,7 @@ public class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
                 int i = 1;
                 // Get a all the values to fill the query with
                 HashMap<String, FieldValue<?>> values = entityMeta.getValues(obj);
-                for (Pair<String, Field<?>> kvp : entityMeta.getFields()) {
+                for (AbstractMap.SimpleEntry<String, Field<?>> kvp : entityMeta.getFields()) {
                     // Find the value for each field and set it in the statment
                     String name = kvp.getKey();
                     Field<?> field = kvp.getValue();
@@ -217,7 +217,7 @@ public class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
                 int i = 1;
                 // Get a all the values to fill the query with
                 HashMap<String, FieldValue<?>> values = entityMeta.getValues(obj);
-                for (Pair<String, Field<?>> kvp : entityMeta.getFields()) {
+                for (AbstractMap.SimpleEntry<String, Field<?>> kvp : entityMeta.getFields()) {
                     // Find the value for each field and set it in the statment
                     String name = kvp.getKey();
                     Field<?> field = kvp.getValue();
