@@ -37,4 +37,6 @@ public interface DatabaseInterface<T extends Entity> {
     T refreshRelations(T obj);
 
     Collection<T> loadAll();
+
+    public abstract boolean createTable();
 }

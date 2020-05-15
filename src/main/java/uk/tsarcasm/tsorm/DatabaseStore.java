@@ -24,6 +24,7 @@ public abstract class DatabaseStore<T extends Entity> implements Store<T> {
 
     @Override
     public void populate() {
+        dbi.createTable();
         entities.clear();
         for (T e : dbi.loadAll()) {
             if (e == null) continue;
