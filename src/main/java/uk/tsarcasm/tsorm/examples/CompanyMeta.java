@@ -10,6 +10,7 @@ public class CompanyMeta extends EntityMeta<Company> {
     final Store<Car> carStore;
 
     public CompanyMeta(Store<Car> carStore) {
+        super("company");
         this.carStore = carStore;
         addPk();
         addField("name", new StringField());

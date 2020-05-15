@@ -12,7 +12,7 @@ import java.util.HashMap;
 
 public class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
     public final boolean canDelete;
-    public String name;
+    public final String name;
     protected EntityMeta<T> entityMeta;
     private String createTableSql;
     private String insertSql;
@@ -24,6 +24,7 @@ public class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
     public ModularDbi(DataSource dataSource, EntityMeta<T> entityMeta, boolean canDelete) {
         super(dataSource);
         this.entityMeta = entityMeta;
+        this.name = entityMeta.tableName;
         this.canDelete = canDelete;
         setupQueryStrings();
     }
@@ -36,6 +37,14 @@ public class ModularDbi<T extends Entity> extends JavaSqlDBI<T> {
         this.updateSql = updateQuery();
         this.loadSql = loadQuery();
         this.loadAllSql = loadAllQuery();
+        System.out.println(this.createTableSql);
+        System.out.println(this.insertSql);
+        System.out.println(this.deleteSql);
+        System.out.println(this.updateSql);
+        System.out.println(this.loadSql);
+        System.out.println(this.loadAllSql);
+        System.out.println("===============");
+
     }
     private String createTableQuery() {
         StringBuilder string = new StringBuilder().append("CREATE TABLE IF NOT EXISTS ").append(name).append(" (");

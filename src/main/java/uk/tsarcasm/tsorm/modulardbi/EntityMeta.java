@@ -9,11 +9,13 @@ import java.util.HashMap;
 import java.util.List;
 
 public abstract class EntityMeta<T extends Entity> {
+    public final String tableName;
     private final List<AbstractMap.SimpleEntry<String, Field<?>>> fields;
     private HashMap<String, FieldValue<?>> values;
     private final HashMap<String, FieldValue<?>> internalValues;
 
-    protected EntityMeta() {
+    protected EntityMeta(String tableName) {
+        this.tableName = tableName;
         this.fields = new ArrayList<>();
         this.internalValues = new HashMap<>();
     }

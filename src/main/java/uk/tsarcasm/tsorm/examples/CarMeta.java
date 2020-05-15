@@ -6,6 +6,7 @@ import uk.tsarcasm.tsorm.modulardbi.fields.StringField;
 
 public class CarMeta extends EntityMeta<Car> {
     public CarMeta() {
+        super("car");
         addPk();
         addField("year", new IntField());
         addField("model", new StringField());
